@@ -79,7 +79,7 @@ def paged(
     result: dict[str, Any] = {
         "count": len(items),
         "total_matching": total,
-        "items": trim(list(items)),
+        "items": [trim(item) for item in items],
     }
     if total > offset + len(items):
         result["next_offset"] = offset + len(items)

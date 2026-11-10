@@ -181,6 +181,22 @@ def test_paged_final_page_has_no_next_offset():
     assert "next_offset" not in out
 
 
+def test_paged_preserves_every_row_across_large_pages():
+    rows = list(range(450))
+    pages = [
+        paged(rows[offset : offset + 300], total=len(rows), limit=300, offset=offset)
+        for offset in (0, 300)
+    ]
+
+    assert pages[0]["count"] == len(pages[0]["items"]) == 300
+    assert pages[0]["items"] == rows[:300]
+    assert pages[0]["next_offset"] == 300
+    assert pages[1]["count"] == len(pages[1]["items"]) == 150
+    assert pages[1]["items"] == rows[300:]
+    assert "next_offset" not in pages[1]
+    assert pages[0]["items"] + pages[1]["items"] == rows
+
+
 # --- indexer response shaping -----------------------------------------------
 
 def test_hits_of_flattens_source_and_keeps_ids():
