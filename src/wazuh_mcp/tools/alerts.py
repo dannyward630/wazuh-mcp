@@ -320,7 +320,9 @@ def register(server: Any, ctx: WazuhContext) -> None:
         description=(
             "Bucket alert counts into time intervals to show trend and spikes — "
             "'was there a spike overnight', 'alert volume per hour this week'. "
-            "Optionally splits each interval by a field such as severity or agent."
+            "Optionally splits each interval by a field such as severity or agent. "
+            "The 500-bucket limit includes split terms; invalid or oversized intervals "
+            "are rejected before querying the Indexer."
         ),
         annotations=READ_ONLY,
     )
@@ -330,8 +332,9 @@ def register(server: Any, ctx: WazuhContext) -> None:
         interval: Annotated[
             str | None,
             Field(description=(
-                "Bucket size such as '5m', '1h', '1d'. Chosen automatically from "
-                "the window length when omitted."
+                "Positive bucket size such as '5m', '1h', '1d', '1w', '1M', '1q', or '1y'. "
+                "Calendar units must be singular. Chosen automatically when omitted; "
+                "the total time and split buckets cannot exceed 500."
             )),
         ] = None,
         split_by: Annotated[
