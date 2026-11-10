@@ -45,7 +45,10 @@ def settings_from(args: argparse.Namespace) -> Settings:
         "http_path": args.path,
     }
     supplied = {k: v for k, v in overrides.items() if v is not None}
-    return settings.model_copy(update=supplied) if supplied else settings
+    if not supplied:
+        return settings
+    # Reconstructing validates CLI values while preserving environment config.
+    return Settings(**{**settings.model_dump(), **supplied})
 
 
 def main(argv: list[str] | None = None) -> int:
